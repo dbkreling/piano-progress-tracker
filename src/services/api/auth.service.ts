@@ -134,6 +134,32 @@ export class AuthService {
   }
 
   /**
+   * Send password reset email to user.
+   */
+  async sendPasswordResetEmail(email: string): Promise<void> {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      throw new Error(`Failed to send password reset email: ${error.message}`);
+    }
+  }
+
+  /**
+   * Update user's password (must be called after clicking reset link).
+   */
+  async updatePassword(newPassword: string): Promise<void> {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      throw new Error(`Failed to update password: ${error.message}`);
+    }
+  }
+
+  /**
    * Get user profile from public.users table.
    */
   private async getUserProfile(
