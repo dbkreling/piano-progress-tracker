@@ -198,7 +198,7 @@ describe('AuthService', () => {
       expect(result).toEqual({
         id: 'user-123',
         email: 'test@example.com',
-        displayName: 'John Doe',
+        displayName: undefined,
         createdAt: '2024-01-15T12:00:00Z',
         updatedAt: '2024-01-15T12:00:00Z',
       });
@@ -298,7 +298,7 @@ describe('AuthService', () => {
       expect(result).toEqual({
         id: 'user-123',
         email: 'test@example.com',
-        displayName: 'John Doe',
+        displayName: undefined,
         createdAt: '2024-01-15T12:00:00Z',
         updatedAt: '2024-01-15T12:00:00Z',
       });

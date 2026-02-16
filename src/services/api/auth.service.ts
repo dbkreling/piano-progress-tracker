@@ -41,23 +41,27 @@ export class AuthService {
    * Sign in an existing user with email and password.
    */
   async signIn(email: string, password: string): Promise<User> {
+    console.log('🔐 AUTH: Starting sign in...');
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    console.log('🔐 AUTH: signInWithPassword completed', { data, error });
 
     if (error) {
+      console.error('❌ AUTH: Sign in error:', error);
       throw new Error(`Sign in failed: ${error.message}`);
     }
 
     if (!data.user) {
+      console.error('❌ AUTH: No user returned');
       throw new Error('Sign in failed: No user returned');
     }
 
-    // Fetch user profile
-    const profile = await this.getUserProfile(data.user.id);
-
-    return this.mapUserFromAuth(data.user, profile?.display_name);
+    console.log('✅ AUTH: Sign in successful, mapping user...');
+    const result = this.mapUserFromAuth(data.user, null);
+    console.log('✅ AUTH: Sign in complete', result);
+    return result;
   }
 
   /**
@@ -89,10 +93,11 @@ export class AuthService {
       return null;
     }
 
-    // Fetch user profile
-    const profile = await this.getUserProfile(user.id);
+    // TEMP: Skip profile fetch to fix loading issue
+    // const profile = await this.getUserProfile(user.id);
+    // return this.mapUserFromAuth(user, profile?.display_name);
 
-    return this.mapUserFromAuth(user, profile?.display_name);
+    return this.mapUserFromAuth(user, null);
   }
 
   /**
@@ -110,9 +115,12 @@ export class AuthService {
    */
   onAuthStateChange(callback: (user: User | null) => void) {
     return supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 AUTH: State change event:', event);
       if (session?.user) {
-        const profile = await this.getUserProfile(session.user.id);
-        callback(this.mapUserFromAuth(session.user, profile?.display_name));
+        // TEMP: Skip profile fetch to fix loading issue
+        // const profile = await this.getUserProfile(session.user.id);
+        // callback(this.mapUserFromAuth(session.user, profile?.display_name));
+        callback(this.mapUserFromAuth(session.user, null));
       } else {
         callback(null);
       }
