@@ -4,6 +4,7 @@ import { usePracticeStats } from './hooks/usePracticeStats';
 import { PracticeSessionForm } from './components/PracticeSessionForm';
 import { PracticeSessionsList } from './components/PracticeSessionsList';
 import { PracticeStats } from './components/PracticeStats';
+import { PracticeCharts } from './components/PracticeCharts';
 import type { PracticeSession } from '../../models/practice';
 
 export function PracticeLogPage() {
@@ -151,6 +152,13 @@ export function PracticeLogPage() {
       {!showForm && sessions.length > 0 && (
         <div className="mb-8">
           <PracticeStats {...stats} />
+        </div>
+      )}
+
+      {/* Charts */}
+      {!showForm && sessions.length > 0 && (
+        <div className="mb-8">
+          <PracticeCharts sessions={sessions} />
         </div>
       )}
 
