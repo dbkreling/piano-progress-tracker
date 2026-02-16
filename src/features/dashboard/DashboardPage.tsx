@@ -8,7 +8,7 @@ export function DashboardPage() {
       <div className="px-4 py-6 sm:px-0">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user?.displayName || 'Pianist'}! 🎹
+            Welcome back! 🎹
           </h1>
           <p className="mt-2 text-gray-600">
             Track your practice, monitor your progress, and achieve your musical goals.
