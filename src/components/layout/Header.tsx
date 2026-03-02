@@ -43,6 +43,12 @@ export function Header() {
                 >
                   Syllabus
                 </Link>
+                <Link
+                  to="/resources"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-indigo-500 hover:text-gray-900"
+                >
+                  Resources
+                </Link>
               </div>
             )}
           </div>

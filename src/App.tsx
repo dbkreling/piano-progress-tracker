@@ -9,6 +9,7 @@ import { ResetPasswordPage } from './features/auth/ResetPasswordPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { PracticeLogPage } from './features/practice-log/PracticeLogPage';
 import { SyllabusPage } from './features/syllabus/SyllabusPage';
+import { ResourcesPage } from './features/resources/ResourcesPage';
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SyllabusPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resources"
+              element={
+                <ProtectedRoute>
+                  <ResourcesPage />
                 </ProtectedRoute>
               }
             />
