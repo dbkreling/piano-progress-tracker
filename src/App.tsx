@@ -8,6 +8,7 @@ import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from './features/auth/ResetPasswordPage';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { PracticeLogPage } from './features/practice-log/PracticeLogPage';
+import { SyllabusPage } from './features/syllabus/SyllabusPage';
 
 function App() {
   return (
@@ -43,10 +44,7 @@ function App() {
               path="/syllabus"
               element={
                 <ProtectedRoute>
-                  <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                    <h1 className="text-2xl font-bold">Syllabus Tracker</h1>
-                    <p className="mt-2 text-gray-600">Coming soon...</p>
-                  </div>
+                  <SyllabusPage />
                 </ProtectedRoute>
               }
             />

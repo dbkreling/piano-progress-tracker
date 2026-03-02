@@ -1,7 +1,32 @@
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { usePracticeSessions } from '../practice-log/hooks/usePracticeSessions';
+import { usePracticeStats } from '../practice-log/hooks/usePracticeStats';
+import { useSyllabusItems } from '../syllabus/hooks/useSyllabusItems';
+import { useSyllabusProgress } from '../syllabus/hooks/useSyllabusProgress';
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Load practice data
+  const { sessions, loading: practiceLoading } = usePracticeSessions();
+  const practiceStats = usePracticeStats(sessions);
+
+  // Load syllabus data
+  const { items: syllabusItems, loading: syllabusLoading } = useSyllabusItems();
+  const syllabusProgress = useSyllabusProgress(syllabusItems);
+
+  const loading = practiceLoading || syllabusLoading;
+
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}h ${mins}m`;
+    }
+    return `${mins}m`;
+  };
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -16,39 +41,49 @@ export function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Quick Stats Placeholder */}
+          {/* Practice Streak */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <dt className="text-sm font-medium text-gray-500 truncate">
                 Practice Streak
               </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">0 days</dd>
+              <dd className="mt-1 text-3xl font-semibold text-indigo-600">
+                {loading ? '-' : practiceStats.streak} {practiceStats.streak === 1 ? 'day' : 'days'}
+              </dd>
               <p className="mt-2 text-sm text-gray-600">
-                Start logging practice to build your streak!
+                {loading ? 'Loading...' : practiceStats.streak > 0 ? 'Keep it up!' : 'Start logging practice to build your streak!'}
               </p>
             </div>
           </div>
 
+          {/* This Week Practice Time */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <dt className="text-sm font-medium text-gray-500 truncate">
-                Total Practice Time
+                This Week
               </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">0 min</dd>
+              <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                {loading ? '-' : formatTime(practiceStats.thisWeekMinutes)}
+              </dd>
               <p className="mt-2 text-sm text-gray-600">
-                This week's practice time
+                Total practice time (last 7 days)
               </p>
             </div>
           </div>
 
+          {/* Syllabus Progress */}
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <dt className="text-sm font-medium text-gray-500 truncate">
                 Syllabus Progress
               </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">0%</dd>
+              <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                {loading ? '-' : `${syllabusProgress.overallPercentage}%`}
+              </dd>
               <p className="mt-2 text-sm text-gray-600">
-                Add items to your syllabus to track progress
+                {loading ? 'Loading...' : syllabusProgress.totalItems > 0
+                  ? `${syllabusProgress.completedItems} of ${syllabusProgress.totalItems} items completed`
+                  : 'Add items to your syllabus to track progress'}
               </p>
             </div>
           </div>
@@ -58,9 +93,12 @@ export function DashboardPage() {
         <div className="mt-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <button className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button
+              onClick={() => navigate('/practice')}
+              className="relative block w-full border-2 border-indigo-300 border-dashed rounded-lg p-12 text-center hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-indigo-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -75,14 +113,17 @@ export function DashboardPage() {
               <span className="mt-2 block text-sm font-medium text-gray-900">
                 Log Practice Session
               </span>
-              <span className="mt-1 block text-sm text-gray-500">
-                Coming soon - Track today's practice
+              <span className="mt-1 block text-sm text-indigo-600">
+                Track today's practice
               </span>
             </button>
 
-            <button className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button
+              onClick={() => navigate('/syllabus')}
+              className="relative block w-full border-2 border-indigo-300 border-dashed rounded-lg p-12 text-center hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            >
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-indigo-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -97,45 +138,46 @@ export function DashboardPage() {
               <span className="mt-2 block text-sm font-medium text-gray-900">
                 Add Syllabus Item
               </span>
-              <span className="mt-1 block text-sm text-gray-500">
-                Coming soon - Track pieces and scales
+              <span className="mt-1 block text-sm text-indigo-600">
+                Track pieces and scales
               </span>
             </button>
           </div>
         </div>
 
-        {/* Welcome Message */}
-        <div className="mt-8 bg-indigo-50 border-l-4 border-indigo-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-indigo-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-indigo-800">
-                Welcome to Piano Progress Tracker!
-              </h3>
-              <div className="mt-2 text-sm text-indigo-700">
-                <p>
-                  Your authentication is working! The practice log, syllabus tracker, and
-                  analytics features are coming next.
-                </p>
-                <p className="mt-2">
-                  Check out the navigation menu above to explore different sections (coming soon).
-                </p>
+        {/* Getting Started */}
+        {!loading && sessions.length === 0 && syllabusItems.length === 0 && (
+          <div className="mt-8 bg-indigo-50 border-l-4 border-indigo-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-indigo-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-indigo-800">
+                  Get Started with Piano Progress Tracker
+                </h3>
+                <div className="mt-2 text-sm text-indigo-700">
+                  <p>
+                    Start tracking your piano journey! Log your first practice session or add pieces to your syllabus.
+                  </p>
+                  <p className="mt-2">
+                    Use the quick action buttons above or navigate through the menu to explore all features.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
